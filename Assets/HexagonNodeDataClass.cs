@@ -6,8 +6,8 @@ public class HexagonNodeDataClass
 {
     private Vector4 adress;
 
-    private static float scaleFactor = 2.8f; // the amount we scale with each w step up.
-    private static float rotationFactor = 20f; //The amount we rotate the world with each step up to preserve symetry;
+    public static float scaleFactor = 2.8f; // the amount we scale with each w step up.
+    public static float rotationFactor = 20f; //The amount we rotate the world with each step up to preserve symetry;
     private static float centerToCenterDistance = 1.1f;
 
     //Theese vector reprecent the kartesian cordinates directions of the x, y and z directions in our hexagonal coordinate system
@@ -30,13 +30,13 @@ public class HexagonNodeDataClass
     {
         Vector2 baseScaleXYPosition = (adress.x * xdirection + adress.y * ydirection + adress.z * zdirection);
         if (adress.w != 0)
-            baseScaleXYPosition *= scaleFactor * adress.w;
+            baseScaleXYPosition *= Mathf.Pow(scaleFactor, adress.w);
 
         return Quaternion.AngleAxis(adress.w * rotationFactor, Vector3.forward) * baseScaleXYPosition; //bit iffy on this but whatever
     }
     public float getSize()
     {
-        return adress.w * scaleFactor;
+        return adress.w == 0 ? 1 : Mathf.Pow(scaleFactor, adress.w);
     }
     public float getRotation()
     {
@@ -55,7 +55,7 @@ public class HexagonNodeDataClass
 
     public Vector4 GetCenterLeafNodeAdress()
     {
-        return new Vector4(adress.x * 3, adress.y * 3, adress.z * 3, adress.w--);
+        return new Vector4(adress.x * 3, adress.y * 3, adress.z * 3, adress.w - 1);
     }
 }
 

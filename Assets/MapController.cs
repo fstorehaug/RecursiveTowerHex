@@ -1,37 +1,84 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MapController : MonoBehaviour
-{ 
+{
     [SerializeField]
     private GameObject HexagonPrefab;
 
     [SerializeField]
     private CameraController camera;
 
+    public InputAction ZoomOut;
+    public InputAction ZoomIn;
 
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
+    private Dictionary<int, GameObject> layers; //TODO: create a gameobject for each layer and child each hex to toggle on/off
 
     HexNode curentCenter;
     HexNode selectedNode;
 
+    private Vector4[] directionalVectors =
+        {
+            new Vector4(1f, 0f, 0f, 0f),
+            new Vector4(-1f, 0f, 0f, 0f),
+            new Vector4(0f, 1f, 0f, 0f),
+            new Vector4(0f, -1f, 0f, 0f),
+            new Vector4(0f, 0f, 1f, 0f),
+            new Vector4(0f, 0f, -1f, 0f)
+        };
+
     private void Start()
     {
+        ZoomIn.Enable();
+        ZoomOut.Enable();
+        ZoomIn.performed += ZoomIn_performed;
+        ZoomOut.performed += ZoomOut_performed;
+
         curentCenter = CreateNodeAtPosition(new Vector4(0f, 0f, 0f, 0f));
         AddeNeighbors(curentCenter);
+    }
+
+    private void ZoomOut_performed(InputAction.CallbackContext obj)
+    {
+        Vector4 targetPosition = curentCenter.node.GetSuperNodeAdress();
+        if (hexagonDict.ContainsKey(targetPosition))
+        {
+            curentCenter = hexagonDict[targetPosition];
+        }
+        else
+        {
+            curentCenter = CreateNodeAtPosition(targetPosition);
+        }
+
+        foreach (Vector4 directionalVector in directionalVectors)
+        {
+            if (!hexagonDict.ContainsKey(targetPosition + directionalVector))
+            {
+                CreateNodeAtPosition(targetPosition + directionalVector);
+            }
+        }
+
+        selectedNode = curentCenter;
+        camera.OnZoomOut(targetPosition);
+
+    }
+
+    private void ZoomIn_performed(InputAction.CallbackContext obj)
+    {
+        throw new System.NotImplementedException();
     }
 
     private void AddeNeighbors(HexNode node)
     {
         Vector4 adress = node.node.getAdress();
 
-     CreateNodeAtPosition(adress + new Vector4(1f, 0f, 0f, 0f));
-     CreateNodeAtPosition(adress + new Vector4(-1f, 0f, 0f, 0f));
-     CreateNodeAtPosition(adress + new Vector4(0f, 1f, 0f, 0f));
-     CreateNodeAtPosition(adress + new Vector4(0f, -1f, 0f, 0f));
-     CreateNodeAtPosition(adress + new Vector4(0f, 0f, 1f, 0f));
-     CreateNodeAtPosition(adress + new Vector4(0f, 0f, -1f, 0f));
+         foreach (Vector4 direction in directionalVectors)
+        {
+            CreateNodeAtPosition(adress + direction);
+        }
     }
 
     private HexNode CreateNodeAtPosition(Vector4 position)
@@ -75,7 +122,11 @@ public class MapController : MonoBehaviour
         selectedNode = node;
         selectedNode.OnSelected();
     }
-    
 
+    private void OnDestroy()
+    {
+        ZoomIn.performed -= ZoomIn_performed;
+        ZoomOut.performed -= ZoomOut_performed;
+    }
 
 }

@@ -4,15 +4,27 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    private Camera camera;
+
+    public void OnZoomOut(Vector4 targetPosition)
     {
-        
+        Vector3 position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z) + new Vector3(0f, 0f , -10f);
+
+        transform.position = position;
+        transform.Rotate(Vector3.forward, HexagonNodeDataClass.rotationFactor);
+
+        camera.orthographicSize *= HexagonNodeDataClass.scaleFactor;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnZomeOut(Vector4 targetPosition)
     {
-        
+        Vector3 position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
+
+        transform.position = position;
+        transform.Rotate(Vector3.up, -HexagonNodeDataClass.rotationFactor);
+
+        camera.orthographicSize /= HexagonNodeDataClass.scaleFactor;
     }
+
 }

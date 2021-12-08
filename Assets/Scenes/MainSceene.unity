@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 1427353359}
   - component: {fileID: 1427353358}
   - component: {fileID: 1427353357}
+  - component: {fileID: 1427353360}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -206,6 +207,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1427353360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427353356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04cc212c69cd0b64f8eee8f801542d9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 1427353358}
 --- !u!1 &2043906441
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,3 +264,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HexagonPrefab: {fileID: 4504756146291314386, guid: 4554c4777d2b98c4dbfeef31f4414bbc, type: 3}
+  camera: {fileID: 1427353360}
+  ZoomOut:
+    m_Name: Zoom Out
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8d481d81-e429-416a-b267-c30d07f047e1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 7f798754-bc30-48e4-aa41-9882b163aee2
+      m_Path: <Keyboard>/1
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Zoom Out
+      m_Flags: 0
+  ZoomIn:
+    m_Name: Zoom In
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: edf656bf-347a-4146-a8a4-ac0fcbc35ff1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: b106bc0a-6e7c-4ef3-86d4-56092b513b6e
+      m_Path: <Keyboard>/2
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Zoom In
+      m_Flags: 0

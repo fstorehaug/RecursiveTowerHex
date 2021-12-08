@@ -23,6 +23,7 @@ public class HexNode : MonoBehaviour
         
         transform.position = node.getPosition();
         transform.Rotate(Vector3.forward, node.getRotation());
+        transform.localScale = Vector3.one * node.getSize();
 
         mapController.registerNodeAtAdress(this, node.getAdress());
     }
