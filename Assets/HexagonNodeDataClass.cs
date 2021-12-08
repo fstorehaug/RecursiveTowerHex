@@ -28,7 +28,10 @@ public class HexagonNodeDataClass
 
     public Vector3 getPosition()
     {
-        Vector2 baseScaleXYPosition = (adress.x * xdirection + adress.y * ydirection + adress.z * zdirection); //* (scaleFactor * (adress.w));
+        Vector2 baseScaleXYPosition = (adress.x * xdirection + adress.y * ydirection + adress.z * zdirection);
+        if (adress.w != 0)
+            baseScaleXYPosition *= scaleFactor * adress.w;
+
         return Quaternion.AngleAxis(adress.w * rotationFactor, Vector3.forward) * baseScaleXYPosition; //bit iffy on this but whatever
     }
     public float getSize()

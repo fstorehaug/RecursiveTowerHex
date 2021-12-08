@@ -2,15 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class MapController : MonoBehaviour
 { 
     [SerializeField]
     private GameObject HexagonPrefab;
 
+    [SerializeField]
+    private CameraController camera;
+
+
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
 
     HexNode curentCenter;
+    HexNode selectedNode;
 
     private void Start()
     {
@@ -43,9 +47,15 @@ public class MapController : MonoBehaviour
     public void registerNodeAtAdress(HexNode node, Vector4 adress)
     {
         if (!hexagonDict.ContainsKey(adress))
+        {
             hexagonDict.Add(adress, node);
-        else
-            hexagonDict[adress] = node;
+            return;
+        }
+         
+        if (hexagonDict[adress] != null)
+            Destroy(hexagonDict[adress]); //TODO pool this
+        
+        hexagonDict[adress] = node;
     }
 
     public HexNode GetNodeAtAdress(Vector4 key)
@@ -56,6 +66,16 @@ public class MapController : MonoBehaviour
         }
         return hexagonDict[key];
     }
+
+    public void OnNodeClicked(HexNode node)
+    {
+        if (selectedNode != null)
+            selectedNode.OnDeSelected();
+        
+        selectedNode = node;
+        selectedNode.OnSelected();
+    }
+    
 
 
 }

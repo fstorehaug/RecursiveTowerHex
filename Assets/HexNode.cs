@@ -8,7 +8,12 @@ public class HexNode : MonoBehaviour
     private MapController mapController;
 
     List<HexNode> neighbors;
-    
+
+    private void OnMouseDown()
+    {
+        mapController.OnNodeClicked(this);
+    }
+
     public void SetUpNode(MapController mapController, HexagonNodeDataClass node)
     {
         neighbors = new List<HexNode>();
@@ -51,6 +56,16 @@ public class HexNode : MonoBehaviour
 
         AddNeighbor(node);
         node.AddNeighbor(this);
+    }
+
+    public void OnSelected()
+    {
+        Debug.Log(this.gameObject.name + " has been selected");
+    }   
+    
+    public void OnDeSelected()
+    {
+        Debug.Log(this.gameObject.name + " has been Deselected");
     }
 
     private void OnDestroy()
