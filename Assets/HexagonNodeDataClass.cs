@@ -8,7 +8,7 @@ public class HexagonNodeDataClass
 
     public static float scaleFactor = (Mathf.Sqrt(28))/2; // the amount we scale with each w step up. 
     public static float rotationFactor = 20f; //The amount we rotate the world with each step up to preserve symetry;
-    private static float centerToCenterDistance = 1.03f;
+    private static float centerToCenterDistance = 1f;
 
     //Theese vector reprecent the kartesian cordinates directions of the x, y and z directions in our hexagonal coordinate system
     private static Vector2 xdirection = new Vector2(0f,1f).normalized * centerToCenterDistance;

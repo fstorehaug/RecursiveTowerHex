@@ -15,8 +15,7 @@ public class MapController : MonoBehaviour
     public InputAction ZoomIn;
 
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
-
-    private Dictionary<int, GameObject> layers; //TODO: create a gameobject for each layer and child each hex to toggle on/off
+    private Dictionary<int, GameObject> layers = new Dictionary<int, GameObject>(); //TODO: create a gameobject for each layer and child each hex to toggle on/off
 
     HexNode curentCenter;
     HexNode selectedNode;
@@ -59,6 +58,9 @@ public class MapController : MonoBehaviour
 
     private void ZoomIn_performed(InputAction.CallbackContext obj)
     {
+        if (selectedNode.node.gethexAdress().w == 0)
+            return;
+
         Vector4 newCenterLeafnodeAdress = selectedNode.node.GetCenterLeafNodeAdress();
         if (hexagonDict.ContainsKey(newCenterLeafnodeAdress))
         {
@@ -90,7 +92,23 @@ public class MapController : MonoBehaviour
         HexNode node = HexInstance.AddComponent<HexNode>();
         node.SetUpNode(this, new HexagonNodeDataClass(position));
 
+        AddNodeToLayer(node);
+
         return node;
+    }
+
+    private void AddNodeToLayer(HexNode node)
+    {
+        int layernumber = (int)node.node.gethexAdress().w;
+        if (!layers.ContainsKey(layernumber))
+        {
+            GameObject layer = new GameObject("Layer_" + layernumber);
+            node.gameObject.transform.parent = layer.transform;
+            layers.Add(layernumber, layer);
+        } else
+        {
+            node.gameObject.transform.parent = layers[layernumber].transform;
+        }
     }
 
     public void registerNodeAtAdress(HexNode node, Vector4 adress)
