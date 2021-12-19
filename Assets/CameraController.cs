@@ -17,12 +17,12 @@ public class CameraController : MonoBehaviour
         camera.orthographicSize *= HexagonNodeDataClass.scaleFactor;
     }
 
-    public void OnZomeOut(Vector4 targetPosition)
+    public void OnZoomIn(Vector4 targetPosition)
     {
-        Vector3 position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
+        Vector3 position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z) + new Vector3(0f, 0f, -10f);
 
         transform.position = position;
-        transform.Rotate(Vector3.up, -HexagonNodeDataClass.rotationFactor);
+        transform.Rotate(Vector3.forward, -HexagonNodeDataClass.rotationFactor);
 
         camera.orthographicSize /= HexagonNodeDataClass.scaleFactor;
     }

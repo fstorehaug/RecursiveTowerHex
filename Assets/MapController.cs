@@ -15,20 +15,11 @@ public class MapController : MonoBehaviour
     public InputAction ZoomIn;
 
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
+
     private Dictionary<int, GameObject> layers; //TODO: create a gameobject for each layer and child each hex to toggle on/off
 
     HexNode curentCenter;
     HexNode selectedNode;
-
-    private Vector4[] directionalVectors =
-        {
-            new Vector4(1f, 0f, 0f, 0f),
-            new Vector4(-1f, 0f, 0f, 0f),
-            new Vector4(0f, 1f, 0f, 0f),
-            new Vector4(0f, -1f, 0f, 0f),
-            new Vector4(0f, 0f, 1f, 0f),
-            new Vector4(0f, 0f, -1f, 0f)
-        };
 
     private void Start()
     {
@@ -53,7 +44,7 @@ public class MapController : MonoBehaviour
             curentCenter = CreateNodeAtPosition(targetPosition);
         }
 
-        foreach (Vector4 directionalVector in directionalVectors)
+        foreach (Vector4 directionalVector in HexagonNodeDataClass.directionalHexVectors)
         {
             if (!hexagonDict.ContainsKey(targetPosition + directionalVector))
             {
@@ -68,14 +59,25 @@ public class MapController : MonoBehaviour
 
     private void ZoomIn_performed(InputAction.CallbackContext obj)
     {
-        throw new System.NotImplementedException();
+        Vector4 newCenterLeafnodeAdress = selectedNode.node.GetCenterLeafNodeAdress();
+        if (hexagonDict.ContainsKey(newCenterLeafnodeAdress))
+        {
+            curentCenter = hexagonDict[newCenterLeafnodeAdress];
+        } else
+        {
+            curentCenter = CreateNodeAtPosition(newCenterLeafnodeAdress);
+            AddeNeighbors(curentCenter);
+        }
+
+        selectedNode = curentCenter;
+        camera.OnZoomIn(curentCenter.node.gethexAdress());
     }
 
     private void AddeNeighbors(HexNode node)
     {
-        Vector4 adress = node.node.getAdress();
+        Vector4 adress = node.node.gethexAdress();
 
-         foreach (Vector4 direction in directionalVectors)
+         foreach (Vector4 direction in HexagonNodeDataClass.directionalHexVectors)
         {
             CreateNodeAtPosition(adress + direction);
         }

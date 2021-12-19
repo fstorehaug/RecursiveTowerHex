@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class HexNode : MonoBehaviour
 {
+
+
     public HexagonNodeDataClass node;
     private MapController mapController;
 
@@ -25,7 +27,7 @@ public class HexNode : MonoBehaviour
         transform.Rotate(Vector3.forward, node.getRotation());
         transform.localScale = Vector3.one * node.getSize();
 
-        mapController.registerNodeAtAdress(this, node.getAdress());
+        mapController.registerNodeAtAdress(this, node.gethexAdress());
     }
 
     public void AddNeighbor(HexNode node)
@@ -40,12 +42,11 @@ public class HexNode : MonoBehaviour
 
     public void NotifyNeighbourOfExistance()
     {
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(1f, 0f, 0f, 0f)));
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(-1f, 0f, 0f, 0f)));
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(0f, 1f, 0f, 0f)));
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(0f, -1f, 0f, 0f)));
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(0f, 0f, 1f, 0f)));
-        AddAndNotifyNode(mapController.GetNodeAtAdress(node.getAdress() + new Vector4(0f, 0f, -1f, 0f)));
+        Vector3 adress = node.getCartesianAdress();
+        foreach (Vector3 offsett in HexagonNodeDataClass.DirectionalVectortransform)
+        {
+            AddAndNotifyNode(mapController.GetNodeAtAdress(adress + offsett));
+        }
     }
 
     private void AddAndNotifyNode(HexNode node)
