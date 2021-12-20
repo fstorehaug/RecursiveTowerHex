@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour
         transform.position = position;
         transform.Rotate(Vector3.forward, HexagonNodeDataClass.rotationFactor);
 
-        camera.orthographicSize *= HexagonNodeDataClass.scaleFactor;
+        camera.orthographicSize *= (float)HexagonNodeDataClass.scaleFactor;
     }
 
     public void OnZoomIn(Vector4 targetPosition)
@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
         transform.position = position;
         transform.Rotate(Vector3.forward, -HexagonNodeDataClass.rotationFactor);
 
-        camera.orthographicSize /= HexagonNodeDataClass.scaleFactor;
+        camera.orthographicSize /= (float)HexagonNodeDataClass.scaleFactor;
     }
 
 }
