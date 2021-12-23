@@ -6,14 +6,14 @@ public class HexagonNodeDataClass
 {
     private Vector4 adress;
 
-    public static double scaleFactor = Mathf.Sqrt(7); // the amount we scale with each w step up. srt((1/2)^2 + ((3/2)*sqrt(3))^2)
+    public static float scaleFactor = Mathf.Sqrt(7); // the amount we scale with each w step up. srt((1/2)^2 + ((3/2)*sqrt(3))^2)
     public static float rotationFactor = 20f; //The amount we rotate the world in degrees with each step up to preserve symetry;
     private static float centerToCenterDistance = Mathf.Sqrt(3);
 
     //Theese vector reprecent the kartesian cordinates directions of the x, y and z directions in our hexagonal coordinate system
-    private static Vector2 xdirection = new Vector2(0f,1f).normalized * centerToCenterDistance;
-    private static Vector2 ydirection = new Vector2(Mathf.Sqrt(3), 1f).normalized * centerToCenterDistance;
-    private static Vector2 zdirection = new Vector2(Mathf.Sqrt(3), -1f).normalized * centerToCenterDistance;
+    private static Vector2 xdirection = new Vector2(0f,1f).normalized * (float)centerToCenterDistance;
+    private static Vector2 ydirection = new Vector2(Mathf.Sqrt(3), 1f).normalized * (float)centerToCenterDistance;
+    private static Vector2 zdirection = new Vector2(Mathf.Sqrt(3), -1f).normalized * (float)centerToCenterDistance;
 
     public static Vector4[] directionalHexVectors =
 {
@@ -65,29 +65,19 @@ public class HexagonNodeDataClass
 
     public Vector3 getPosition()
     {
-        Vector2 baseScaleXYPosition = ((adress.x * xdirection) + (adress.y * ydirection) + (adress.z * zdirection));
-        baseScaleXYPosition *= (float)doublePower(scaleFactor, (int)adress.w);
-        
-        return Quaternion.AngleAxis(adress.w * rotationFactor, Vector3.forward) * baseScaleXYPosition; //bit iffy on this but whatever
+        Vector4 leafnodeAdress = adress;
+        for (int i = 0; i < adress.w; i++)
+        {
+           leafnodeAdress = leafnodeAdress.x * heightspaceTransformation.GetColumn(0) + leafnodeAdress.y * heightspaceTransformation.GetColumn(1) + leafnodeAdress.z * heightspaceTransformation.GetColumn(2) + new Vector4(0, 0, 0, i);
+        }
+
+        Vector3 baseScaleXYPosition = ((leafnodeAdress.x * xdirection) + (leafnodeAdress.y * ydirection) + (leafnodeAdress.z * zdirection));
+
+        return baseScaleXYPosition;
     }
     public float getSize()
     {
-        return (float)doublePower(scaleFactor, (int)adress.w);
-    }
-
-    private double doublePower(double number, int power)
-    {
-        if (power == 0)
-        {
-            return 1;
-        }
-
-        for(int i = 0; i < power-1; i++)
-        {
-            number *= number;
-        }
-
-        return number;
+        return Mathf.Pow(scaleFactor, (int)adress.w);
     }
 
     public float getRotation()
@@ -108,9 +98,6 @@ public class HexagonNodeDataClass
     public Vector4 GetCenterLeafNodeAdress()
     {
         return adress.x * heightspaceTransformation.GetColumn(0) + adress.y * heightspaceTransformation.GetColumn(1) + adress.z * heightspaceTransformation.GetColumn(2) + new Vector4(0, 0, 0, adress.w - 1);
-
-        //return (adress.x * new Vector4(2f, 0f, -1f, 0f)) + (adress.y * new Vector4(1f, 2f, 0f, 0f)) + (adress.z * new Vector4(0f, 1f, 2f, 0f) + new Vector4(0f, 0f, 0f, adress.w - 1f));
-
     }
 }
 
