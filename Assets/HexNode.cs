@@ -23,11 +23,11 @@ public class HexNode : MonoBehaviour
         this.node = node;
         this.mapController = mapController;
         
-        transform.position = node.getPosition();
+        transform.position = HexagonNodeDataClass.GetPosition(node.GethexAdress());
         transform.Rotate(Vector3.forward, node.getRotation());
         transform.localScale = Vector3.one * node.getSize();
 
-        mapController.registerNodeAtAdress(this, node.gethexAdress());
+        mapController.registerNodeAtAdress(this, node.GethexAdress(), HexagonNodeDataClass.GetPosition(node.GethexAdress()));
     }
 
     public void AddNeighbor(HexNode node)

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
 
 public class HexagonNodeDataClass
 {
@@ -25,8 +26,8 @@ public class HexagonNodeDataClass
         new Vector4(0f, 0f, -1f, 0f)
     };
 
-    private Matrix4x4 heightspaceTransformation = new Matrix4x4(new Vector4(2f, 0f, -1f, 0f), new Vector4(1f, 2f, 0f, 0f), new Vector4(0f, 1f, 2f, 0f), new Vector4(0, 0, 0, 1));
-    private Matrix4x4 InverseHeightTransformation { get { return heightspaceTransformation.inverse; } }
+    private static Matrix4x4 heightspaceTransformation = new Matrix4x4(new Vector4(2f, 0f, -1f, 0f), new Vector4(1f, 2f, 0f, 0f), new Vector4(0f, 1f, 2f, 0f), new Vector4(0, 0, 0, 1));
+    private static Matrix4x4 InverseHeightTransformation { get { return heightspaceTransformation.inverse; } }
 
     public static Vector3[] DirectionalVectortransform
     {
@@ -53,7 +54,7 @@ public class HexagonNodeDataClass
         return xyhpos;
     }
 
-    public Vector4 gethexAdress()
+    public Vector4 GethexAdress()
     {
         return adress;
     }
@@ -63,12 +64,12 @@ public class HexagonNodeDataClass
         return HexToPosCoordinates(adress);
     }
 
-    public Vector3 getPosition()
+    public static Vector3 GetPosition(Vector4 hexAdress)
     {
-        Vector4 leafnodeAdress = adress;
-        for (int i = 0; i < adress.w; i++)
+        Vector4 leafnodeAdress = hexAdress;
+        for (int i = 0; i < hexAdress.w; i++)
         {
-           leafnodeAdress = leafnodeAdress.x * heightspaceTransformation.GetColumn(0) + leafnodeAdress.y * heightspaceTransformation.GetColumn(1) + leafnodeAdress.z * heightspaceTransformation.GetColumn(2) + new Vector4(0, 0, 0, i);
+           leafnodeAdress = leafnodeAdress.x * heightspaceTransformation.GetColumn(0) + leafnodeAdress.y * heightspaceTransformation.GetColumn(1) + leafnodeAdress.z * heightspaceTransformation.GetColumn(2);
         }
 
         Vector3 baseScaleXYPosition = ((leafnodeAdress.x * xdirection) + (leafnodeAdress.y * ydirection) + (leafnodeAdress.z * zdirection));
@@ -90,14 +91,19 @@ public class HexagonNodeDataClass
         return new Vector4(adress.x + direction.x, adress.y + direction.y, adress.z + direction.z, adress.w);
     }
 
+    public Vector3 GetNebourPosition(Vector3 direction)
+    {
+        return GetPosition(GetNeightborAdress(direction));
+    }
+
     public Vector4 GetSuperNodeAdress()
     {
-        return adress.x * InverseHeightTransformation.GetColumn(0) + adress.y * InverseHeightTransformation.GetColumn(1) + adress.z * InverseHeightTransformation.GetColumn(2) + new Vector4(0, 0, 0, adress.w + 1);
+        return (adress.x * InverseHeightTransformation.GetColumn(0)) + (adress.y * InverseHeightTransformation.GetColumn(1)) + (adress.z * InverseHeightTransformation.GetColumn(2)) + new Vector4(0, 0, 0, adress.w + 1);
     }
 
     public Vector4 GetCenterLeafNodeAdress()
     {
-        return adress.x * heightspaceTransformation.GetColumn(0) + adress.y * heightspaceTransformation.GetColumn(1) + adress.z * heightspaceTransformation.GetColumn(2) + new Vector4(0, 0, 0, adress.w - 1);
+        return (adress.x * heightspaceTransformation.GetColumn(0)) + (adress.y * heightspaceTransformation.GetColumn(1)) + (adress.z * heightspaceTransformation.GetColumn(2)) + new Vector4(0, 0, 0, Mathf.Clamp(adress.w - 1, 0f, int.MaxValue));
     }
 }
 

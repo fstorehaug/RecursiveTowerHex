@@ -15,6 +15,8 @@ public class MapController : MonoBehaviour
     public InputAction ZoomIn;
 
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
+    private Dictionary<Vector3, HexNode> PositionToHexagon = new Dictionary<Vector3, HexNode>();
+
     private Dictionary<int, GameObject> layers = new Dictionary<int, GameObject>(); //TODO: create a gameobject for each layer and child each hex to toggle on/off
 
     HexNode curentCenter;
@@ -27,27 +29,29 @@ public class MapController : MonoBehaviour
         ZoomIn.performed += ZoomIn_performed;
         ZoomOut.performed += ZoomOut_performed;
 
-        curentCenter = CreateNodeAtPosition(new Vector4(0f, 0f, 0f, 0f));
+        curentCenter = CreateNodeAtHexPosition(new Vector4(0f, 0f, 0f, 0f));
+        selectedNode = curentCenter;
         AddeNeighbors(curentCenter);
     }
 
     private void ZoomOut_performed(InputAction.CallbackContext obj)
     {
-        Vector4 targetPosition = curentCenter.node.GetSuperNodeAdress();
-        if (hexagonDict.ContainsKey(targetPosition))
+        Vector3 targetPosition = HexagonNodeDataClass.GetPosition(curentCenter.node.GethexAdress());
+        targetPosition.z = curentCenter.node.GethexAdress().w + 1;
+        if (PositionToHexagon.ContainsKey(targetPosition))
         {
-            curentCenter = hexagonDict[targetPosition];
+            curentCenter = PositionToHexagon[targetPosition];
         }
         else
         {
-            curentCenter = CreateNodeAtPosition(targetPosition);
+            curentCenter = CreateNodeAtHexPosition(curentCenter.node.GetSuperNodeAdress());
         }
 
         foreach (Vector4 directionalVector in HexagonNodeDataClass.directionalHexVectors)
         {
-            if (!hexagonDict.ContainsKey(targetPosition + directionalVector))
+            if (!PositionToHexagon.ContainsKey(HexagonNodeDataClass.GetPosition(curentCenter.node.GethexAdress() + directionalVector)))
             {
-                CreateNodeAtPosition(targetPosition + directionalVector);
+                CreateNodeAtHexPosition(curentCenter.node.GethexAdress() + directionalVector);
             }
         }
 
@@ -58,7 +62,7 @@ public class MapController : MonoBehaviour
 
     private void ZoomIn_performed(InputAction.CallbackContext obj)
     {
-        if (selectedNode.node.gethexAdress().w == 0)
+        if (selectedNode.node.GethexAdress().w == 0)
             return;
 
         Vector4 newCenterLeafnodeAdress = selectedNode.node.GetCenterLeafNodeAdress();
@@ -67,25 +71,25 @@ public class MapController : MonoBehaviour
             curentCenter = hexagonDict[newCenterLeafnodeAdress];
         } else
         {
-            curentCenter = CreateNodeAtPosition(newCenterLeafnodeAdress);
+            curentCenter = CreateNodeAtHexPosition(newCenterLeafnodeAdress);
             AddeNeighbors(curentCenter);
         }
 
         selectedNode = curentCenter;
-        camera.OnZoomIn(curentCenter.node.gethexAdress());
+        camera.OnZoomIn(curentCenter.node.GethexAdress());
     }
 
     private void AddeNeighbors(HexNode node)
     {
-        Vector4 adress = node.node.gethexAdress();
+        Vector4 adress = node.node.GethexAdress();
 
          foreach (Vector4 direction in HexagonNodeDataClass.directionalHexVectors)
         {
-            CreateNodeAtPosition(adress + direction);
+            CreateNodeAtHexPosition(adress + direction);
         }
     }
 
-    private HexNode CreateNodeAtPosition(Vector4 position)
+    private HexNode CreateNodeAtHexPosition(Vector4 position)
     {
         GameObject HexInstance = Instantiate(HexagonPrefab);
         HexInstance.name = "HexNode: " + position.ToString();
@@ -99,7 +103,7 @@ public class MapController : MonoBehaviour
 
     private void AddNodeToLayer(HexNode node)
     {
-        int layernumber = (int)node.node.gethexAdress().w;
+        int layernumber = (int)node.node.GethexAdress().w;
         if (!layers.ContainsKey(layernumber))
         {
             GameObject layer = new GameObject("Layer_" + layernumber);
@@ -111,18 +115,32 @@ public class MapController : MonoBehaviour
         }
     }
 
-    public void registerNodeAtAdress(HexNode node, Vector4 adress)
+    public void registerNodeAtAdress(HexNode node, Vector4 hexAdress, Vector3 positionalAdress)
     {
-        if (!hexagonDict.ContainsKey(adress))
+        if (!hexagonDict.ContainsKey(hexAdress))
         {
-            hexagonDict.Add(adress, node);
-            return;
+            hexagonDict.Add(hexAdress, node);
         }
-         
-        if (hexagonDict[adress] != null)
-            Destroy(hexagonDict[adress]); //TODO pool this
-        
-        hexagonDict[adress] = node;
+        else
+        {
+            if (hexagonDict[hexAdress] != null)
+                Destroy(hexagonDict[hexAdress]); //TODO pool this
+
+            hexagonDict[hexAdress] = node;
+        }
+
+        if (!PositionToHexagon.ContainsKey(positionalAdress))
+        {
+            PositionToHexagon.Add(positionalAdress, node);
+        } 
+        else
+        {
+            if (PositionToHexagon[positionalAdress] != null)
+                Destroy(PositionToHexagon[positionalAdress]);
+
+            PositionToHexagon[positionalAdress] = node;
+        }
+    
     }
 
     public HexNode GetNodeAtAdress(Vector4 key)
