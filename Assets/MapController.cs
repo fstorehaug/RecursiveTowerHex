@@ -15,7 +15,6 @@ public class MapController : MonoBehaviour
     public InputAction ZoomIn;
 
     private Dictionary<Vector4, HexNode> hexagonDict = new Dictionary<Vector4, HexNode>();
-    private Dictionary<Vector3, HexNode> PositionToHexagon = new Dictionary<Vector3, HexNode>();
 
     private Dictionary<int, GameObject> layers = new Dictionary<int, GameObject>(); //TODO: create a gameobject for each layer and child each hex to toggle on/off
 
@@ -36,22 +35,23 @@ public class MapController : MonoBehaviour
 
     private void ZoomOut_performed(InputAction.CallbackContext obj)
     {
-        Vector3 targetPosition = HexagonNodeDataClass.GetPosition(curentCenter.node.GethexAdress());
-        targetPosition.z = curentCenter.node.GethexAdress().w + 1;
-        if (PositionToHexagon.ContainsKey(targetPosition))
+        Vector4 targetPosition = curentCenter.node.GetSuperNodeAdress();
+
+        if (hexagonDict.ContainsKey(targetPosition))
         {
-            curentCenter = PositionToHexagon[targetPosition];
+            curentCenter = hexagonDict[targetPosition];
         }
         else
         {
-            curentCenter = CreateNodeAtHexPosition(curentCenter.node.GetSuperNodeAdress());
+            curentCenter = CreateNodeAtHexPosition(targetPosition);
         }
 
         foreach (Vector4 directionalVector in HexagonNodeDataClass.directionalHexVectors)
         {
-            if (!PositionToHexagon.ContainsKey(HexagonNodeDataClass.GetPosition(curentCenter.node.GethexAdress() + directionalVector)))
+            Vector4 reducedAdress = HexagonNodeDataClass.ReducedHexAdress(targetPosition + directionalVector);
+            if (!hexagonDict.ContainsKey(reducedAdress))
             {
-                CreateNodeAtHexPosition(curentCenter.node.GethexAdress() + directionalVector);
+                CreateNodeAtHexPosition(HexagonNodeDataClass.ReducedHexAdress(targetPosition + directionalVector));
             }
         }
 
@@ -85,7 +85,7 @@ public class MapController : MonoBehaviour
 
          foreach (Vector4 direction in HexagonNodeDataClass.directionalHexVectors)
         {
-            CreateNodeAtHexPosition(adress + direction);
+            CreateNodeAtHexPosition(HexagonNodeDataClass.ReducedHexAdress(adress + direction));
         }
     }
 
@@ -115,7 +115,7 @@ public class MapController : MonoBehaviour
         }
     }
 
-    public void registerNodeAtAdress(HexNode node, Vector4 hexAdress, Vector3 positionalAdress)
+    public void registerNodeAtAdress(HexNode node, Vector4 hexAdress)
     {
         if (!hexagonDict.ContainsKey(hexAdress))
         {
@@ -128,19 +128,6 @@ public class MapController : MonoBehaviour
 
             hexagonDict[hexAdress] = node;
         }
-
-        if (!PositionToHexagon.ContainsKey(positionalAdress))
-        {
-            PositionToHexagon.Add(positionalAdress, node);
-        } 
-        else
-        {
-            if (PositionToHexagon[positionalAdress] != null)
-                Destroy(PositionToHexagon[positionalAdress]);
-
-            PositionToHexagon[positionalAdress] = node;
-        }
-    
     }
 
     public HexNode GetNodeAtAdress(Vector4 key)

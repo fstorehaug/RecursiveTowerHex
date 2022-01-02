@@ -105,5 +105,66 @@ public class HexagonNodeDataClass
     {
         return (adress.x * heightspaceTransformation.GetColumn(0)) + (adress.y * heightspaceTransformation.GetColumn(1)) + (adress.z * heightspaceTransformation.GetColumn(2)) + new Vector4(0, 0, 0, Mathf.Clamp(adress.w - 1, 0f, int.MaxValue));
     }
+
+    //this is hella ugly, and in desperate need of linear algebra or group theory.
+    public static Vector4 ReducedHexAdress(Vector4 complexAdress)
+    {
+        int x = (int)complexAdress.x;
+        int y = (int)complexAdress.y;
+        int z = (int)complexAdress.z;
+
+        
+        if (x > 0 && z > 0)
+        {
+            int lowestValue = Mathf.Abs(x) > Mathf.Abs(z) ? Mathf.Abs(z) : Mathf.Abs(x);
+            x -= lowestValue;
+            y += lowestValue;
+            z -= lowestValue;
+        } 
+        
+        if (x > 0 && y < 0)
+        {
+            int lowestValue = Mathf.Abs(x) > Mathf.Abs(y) ? Mathf.Abs(y) : Mathf.Abs(x);
+            x -= lowestValue;
+            y += lowestValue;
+            z -= lowestValue;
+        }
+        
+        if (y > 0 && x < 0)
+        {
+            int lowestValue = Mathf.Abs(x) > Mathf.Abs(y) ? Mathf.Abs(y) : Mathf.Abs(x);
+            x += lowestValue;
+            y -= lowestValue;
+            z += lowestValue;
+        } 
+        
+        if (y > 0 && z < 0)
+        {
+            int lowestValue = Mathf.Abs(z) > Mathf.Abs(y) ? Mathf.Abs(y) : Mathf.Abs(z);
+            x += lowestValue;
+            y -= lowestValue;
+            z += lowestValue;
+        }
+        
+        if (z > 0 && y < 0)
+        {
+            int lowestValue = Mathf.Abs(z) > Mathf.Abs(y) ? Mathf.Abs(y) : Mathf.Abs(z);
+            x -= lowestValue;
+            y += lowestValue;
+            z -= lowestValue;
+        }
+        
+        if (z < 0 && x < 0)
+        {
+            int lowestValue = Mathf.Abs(x) > Mathf.Abs(z) ? Mathf.Abs(z) : Mathf.Abs(x);
+            x += lowestValue;
+            y -= lowestValue;
+            z += lowestValue;
+        }
+
+        return new Vector4(x, y, z, complexAdress.w);
+        
+    }
+
 }
 

@@ -27,7 +27,7 @@ public class HexNode : MonoBehaviour
         transform.Rotate(Vector3.forward, node.getRotation());
         transform.localScale = Vector3.one * node.getSize();
 
-        mapController.registerNodeAtAdress(this, node.GethexAdress(), HexagonNodeDataClass.GetPosition(node.GethexAdress()));
+        mapController.registerNodeAtAdress(this, node.GethexAdress());
     }
 
     public void AddNeighbor(HexNode node)
@@ -45,7 +45,7 @@ public class HexNode : MonoBehaviour
         Vector3 adress = node.getCartesianAdress();
         foreach (Vector3 offsett in HexagonNodeDataClass.DirectionalVectortransform)
         {
-            AddAndNotifyNode(mapController.GetNodeAtAdress(adress + offsett));
+            AddAndNotifyNode(mapController.GetNodeAtAdress(HexagonNodeDataClass.ReducedHexAdress( adress + offsett)));
         }
     }
 
